@@ -19,10 +19,11 @@ setup(
     license='MIT',
     tests_require=['pytest'],
     entry_points={
-        'console_scripts': [
-            'dummy_camera_node = ika_robot.dummy_camera_node:main',
-            'dummy_camera_subscriber = ika_robot.dummy_camera_subscriber:main',
-        ],
-    },
+    'console_scripts': [
+        'dummy_camera_node = ika_robot.dummy_camera_node:main',
+        'dummy_camera_subscriber = ika_robot.dummy_camera_subscriber:main',
+    ],
+},
+
 )
 
