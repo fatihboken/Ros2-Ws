@@ -8,18 +8,20 @@ class ObstacleAvoidanceNode(Node):
         super().__init__('obstacle_avoidance_node')
         self.lidar_sub = self.create_subscription(
             LaserScan,
-            '/scan',
+            'scan',          # fake_lidar_publisher ile aynı topic
             self.lidar_callback,
             10)
-        self.cmd_pub = self.create_publisher(Twist, '/cmd_vel', 10)
+        self.cmd_pub = self.create_publisher(Twist, 'cmd_vel', 10)
         self.threshold_distance = 1.0  # metre cinsinden engel mesafesi sınırı
 
     def lidar_callback(self, msg: LaserScan):
-        # LIDAR verisinin ön kısmını alıyoruz (örneğin, ortadaki 30 derece)
-        front_angles = msg.ranges[len(msg.ranges)//2 - 15 : len(msg.ranges)//2 + 15]
+        # LIDAR verisinin ön kısmını (örneğin ortadaki 30 derece) alıyoruz
+        center_index = len(msg.ranges) // 2
+        window_size = 15  # ±15 okuma (~30 derece)
+        front_angles = msg.ranges[center_index - window_size : center_index + window_size]
 
-        # Geçersiz veya sonsuz değerleri filtrele
-        valid_ranges = [dist for dist in front_angles if dist > 0.0 and dist < float('inf')]
+        # Geçersiz (0 veya sonsuz) değerleri filtrele
+        valid_ranges = [dist for dist in front_angles if msg.range_min < dist < msg.range_max]
 
         if not valid_ranges:
             self.get_logger().info('No valid LIDAR data received')
